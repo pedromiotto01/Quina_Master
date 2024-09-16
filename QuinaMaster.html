@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QuinaMaster</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-image: url(https://cdn.leonardo.ai/users/57012a75-d7ed-4dce-8cdf-618b383db4a9/generations/654adca8-f376-4a52-9dc6-9b7723ad464f/Leonardo_Kino_XL_I_want_an_image_with_a_text_written_QuinaMast_2.jpg?w=512); /* Caminho para a imagem */
+            background-size: cover; /* Ajusta a imagem para cobrir toda a tela */
+            background-position: center; /* Centraliza a imagem */
+            background-repeat: no-repeat; /* Evita que a imagem se repita */
+            color: white; /* Cor do texto para se destacar no fundo */
+            text-shadow: 1px 1px 2px black; /* Adiciona uma sombra ao texto para melhor visibilidade */
+        }
+        #apostas {
+            margin-top: 20px;
+        }
+        .jogo {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quina Master</h1>
+    <p>Insira os últimos 20 sorteios (6 números por sorteio):</p>
+    <textarea id="input-sorteios" rows="10" cols="30" placeholder="Ex: 5, 12, 23, 34, 45, 56..."></textarea><br>
+    <button onclick="gerarApostas()">Gerar Apostas</button>
+    <div id="apostas"></div>
+
+    <script>
+        function gerarApostas() {
+            const input = document.getElementById('input-sorteios').value;
+            const sorteios = input.split('\n').map(linha => 
+                linha.split(',').map(num => parseInt(num.trim()))
+            );
+
+            // Verificar se o input está correto
+            if (sorteios.length !== 20 || sorteios.some(sorteio => sorteio.length !== 6)) {
+                alert('Por favor, insira 20 sorteios, cada um com 6 números.');
+                return;
+            }
+
+            // Contar a frequência de cada número
+            const frequencia = {};
+            for (const sorteio of sorteios) {
+                for (const numero of sorteio) {
+                    if (!frequencia[numero]) {
+                        frequencia[numero] = 0;
+                    }
+                    frequencia[numero]++;
+                }
+            }
+
+            // Ordenar números por frequência
+            const numerosOrdenados = Object.keys(frequencia).map(Number).sort((a, b) => frequencia[b] - frequencia[a]);
+
+            // Gerar 4 jogos
+            const jogos = [];
+            for (let i = 0; i < 4; i++) {
+                const jogo = [];
+                while (jogo.length < 6) {
+                    const numero = numerosOrdenados[Math.floor(Math.random() * numerosOrdenados.length)];
+                    if (!jogo.includes(numero)) {
+                        jogo.push(numero);
+                    }
+                }
+                jogo.sort((a, b) => a - b);
+                jogos.push(jogo);
+            }
+
+            // Exibir os jogos gerados
+            const apostasDiv = document.getElementById('apostas');
+            apostasDiv.innerHTML = ''; // Limpar resultados anteriores
+            jogos.forEach((jogo, index) => {
+                const jogoDiv = document.createElement('div');
+                jogoDiv.classList.add('jogo');
+                jogoDiv.innerText = `Jogo ${index + 1}: ${jogo.join(', ')}`;
+                apostasDiv.appendChild(jogoDiv);
+            });
+        }
+    </script>
+</body>
+</html>
+
